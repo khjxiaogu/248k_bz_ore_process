@@ -1,0 +1,12 @@
+{
+    "name": "248k_bz_ore_process",
+    "version": "1.0.0",
+    "title": "add bz ores to 248k ",
+    "author": "khjxiaogu",
+    "factorio_version": "1.1",
+    "description": "added bz ore processing to 248k mod",
+    "dependencies": [
+        "base >= 1.0.0",
+        "248k"
+    ]
+}
