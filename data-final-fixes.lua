@@ -7,7 +7,7 @@ function extract_amount(object)
 		aamt=((object.amount_max+object.amount_min)/2.0);
 	end
 	if not aamt then 
-		return object[1]
+		return object[2]
 	end
 	return aamt * (object.probability or 1)
 end
@@ -85,7 +85,7 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 	log(serpent.block(results))
 	log(main_product)
 	log("----------------")
-	local division=extract_amount(find_name(results,main_product))
+	local division=extract_amount(find_name(results,main_product))/10
 	for _,v in ipairs(results) do
 		if extract_name(v) ~= main_product then
 			-- ore are added directly
