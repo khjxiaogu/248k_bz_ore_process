@@ -59,12 +59,17 @@ function reduce_probability(object,division)
 	if object.amount then
 		local actamount=object.probability*object.amount
 		if actamount<1 then
-			object.probability=object.amount*object.probability
+			object.probability=actamount
 			object.amount=1
 		elseif actamount==math.floor(actamount) then
 			object.probability=1
 			object.amount=actamount
 		end
+	elseif object.probability>1 then
+		local factor=math.ceil(object.probability)
+		object.probability=object.probability/factor
+		object.amount_min=object.amount_min*factor
+		object.amount_max=object.amount_max*factor
 	end
 	
 	return object
@@ -82,14 +87,14 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 	end
 	products=recipe[cost_type].results
 	log("----------------")
-	log(serpent.block(results))
-	log(main_product)
-	log("----------------")
+	log("byproducts = "..serpent.block(results))
+	log("main_product = "..main_product)
+	
 	local division=extract_amount(find_name(results,main_product))/10
+	log("division = "..division)
 	for _,v in ipairs(results) do
 		if extract_name(v) ~= main_product then
 			-- ore are added directly
-			log(serpent.block(v))
 			if string.find(extract_name(v),"-ore") then
 				table.insert(products,reduce_probability(table.deepcopy(v),division))
 			else
@@ -98,13 +103,13 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 				if nrecipe and nrecipe.category == "smelting" then
 					if nrecipe[cost_type] then
 						local subdivision=extract_amount(find_name(nrecipe[cost_type].results,extract_name(v)))*division
-						for _,v in ipairs(remove_catalyst_ingredient(nrecipe[cost_type].ingredients,nrecipe[cost_type].results)) do
-							table.insert(products,reduce_probability(table.deepcopy(v),subdivision))
+						for _,v2 in ipairs(remove_catalyst_ingredient(nrecipe[cost_type].ingredients,nrecipe[cost_type].results)) do
+							table.insert(products,reduce_probability(table.deepcopy(v2),subdivision/extract_amount(v)))
 						end
 					elseif nrecipe.ingredients then
 						local subdivision=extract_amount(find_name(nrecipe.results,extract_name(v)))*division
-						for _,v in ipairs(remove_catalyst_ingredient(nrecipe.ingredients,nrecipe.results)) do
-							table.insert(products,reduce_probability(table.deepcopy(v),subdivision))
+						for _,v2 in ipairs(remove_catalyst_ingredient(nrecipe.ingredients,nrecipe.results)) do
+							table.insert(products,reduce_probability(table.deepcopy(v2),subdivision/extract_amount(v)))
 						end
 					end
 				else
@@ -114,7 +119,7 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 			end
 		end
 	end
-
+	log("----------------")
 
 
 end
@@ -142,9 +147,11 @@ for k,v in pairs(data.raw["resource"]) do
 		local recipe=data.raw["recipe"][on..'-plate']
 		if recipe then
 			if recipe.normal and recipe.normal.results then
+				log(serpent.block(recipe.normal.ingredients))
 				handle_byproducts(data.raw["recipe"]['el_purify_'   ..on..'_recipe'],on..'-plate',remove_catalyst_results(recipe.normal.ingredients,recipe.normal.results),'normal')
 			end
 			if recipe.expensive and recipe.expensive.results then
+				log(serpent.block(recipe.expensive.ingredients))
 				handle_byproducts(data.raw["recipe"]['el_purify_'   ..on..'_recipe'],on..'-plate',remove_catalyst_results(recipe.expensive.ingredients,recipe.expensive.results),'expensive')
 			end
 			if (not recipe.normal) and (not recipe.expensive) and recipe.results then
