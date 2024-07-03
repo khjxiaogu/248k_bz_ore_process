@@ -81,15 +81,10 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 		}
 	end
 	products=recipe[cost_type].results
-	log("----------------")
-	log(serpent.block(results))
-	log(main_product)
-	log("----------------")
 	local division=extract_amount(find_name(results,main_product))/10
 	for _,v in ipairs(results) do
 		if extract_name(v) ~= main_product then
 			-- ore are added directly
-			log(serpent.block(v))
 			if string.find(extract_name(v),"-ore") then
 				table.insert(products,reduce_probability(table.deepcopy(v),division))
 			else
