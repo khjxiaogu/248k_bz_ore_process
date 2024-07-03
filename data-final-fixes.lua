@@ -86,12 +86,7 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 		}
 	end
 	products=recipe[cost_type].results
-	log("----------------")
-	log("byproducts = "..serpent.block(results))
-	log("main_product = "..main_product)
-	
 	local division=extract_amount(find_name(results,main_product))/10
-	log("division = "..division)
 	for _,v in ipairs(results) do
 		if extract_name(v) ~= main_product then
 			-- ore are added directly
@@ -119,7 +114,6 @@ function handle_byproducts(recipe,main_product,results,cost_type)
 			end
 		end
 	end
-	log("----------------")
 
 
 end
@@ -147,11 +141,9 @@ for k,v in pairs(data.raw["resource"]) do
 		local recipe=data.raw["recipe"][on..'-plate']
 		if recipe then
 			if recipe.normal and recipe.normal.results then
-				log(serpent.block(recipe.normal.ingredients))
 				handle_byproducts(data.raw["recipe"]['el_purify_'   ..on..'_recipe'],on..'-plate',remove_catalyst_results(recipe.normal.ingredients,recipe.normal.results),'normal')
 			end
 			if recipe.expensive and recipe.expensive.results then
-				log(serpent.block(recipe.expensive.ingredients))
 				handle_byproducts(data.raw["recipe"]['el_purify_'   ..on..'_recipe'],on..'-plate',remove_catalyst_results(recipe.expensive.ingredients,recipe.expensive.results),'expensive')
 			end
 			if (not recipe.normal) and (not recipe.expensive) and recipe.results then
